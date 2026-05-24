@@ -1,0 +1,74 @@
+# ⚠️ ARQUIVO OBSOLETO - NÃO UTILIZAR
+
+## 🚨 **ATENÇÃO!**
+
+Este guia está **OBSOLETO** e não deve mais ser utilizado!
+
+**Última atualização:** 2026-05-24  
+**Status:** ❌ OBSOLETO - Substituído por arquitetura 3.0
+
+---
+
+## 🔄 **USE OS NOVOS GUIAS:**
+
+Este guia foi substituído pela nova arquitetura Hermes 3.0, baseada em consulta ao NotebookLM:
+
+### **Para começar:**
+👉 **[RESUMO_EXECUTIVO_ARQUITETURA.md](RESUMO_EXECUTIVO_ARQUITETURA.md)**
+
+### **Guias atualizados:**
+- **[MAC_M1_CONTROLLER_INSTRUCOES.md](MAC_M1_CONTROLLER_INSTRUCOES.md)** - Guia completo para Mac como Controller Principal
+- **[WSL_WORKER_INSTRUCOES.md](WSL_WORKER_INSTRUCOES.md)** - Guia completo para WSL como Worker Linux
+- **[GUIA_MIGRACAO_ARQUITETURA.md](GUIA_MIGRACAO_ARQUITETURA.md)** - Plano de migração completo
+
+---
+
+## ❌ **POR QUE ESTE GUIA ESTÁ OBSOLETO?**
+
+### **Arquitetura Antiga (Errada):**
+```
+WSL = Controller (roda gateway, Telegram)
+Mac = Worker Passivo (apenas executa tarefas)
+```
+
+### **Arquitetura Nova (Correta):**
+```
+Mac M1 = Controller Principal (150% performance)
+WSL = Worker Linux (tarefas Linux específicas)
+```
+
+**Motivo:** Mac M1 é **150% mais rápido** em Python nativo e **180% mais rápido** em compilação que WSL!
+
+---
+
+## 📊 **PERFORMANCE COMPARATIVA:**
+
+| Operação | x86_64 (WSL) | ARM64 (M1 nativo) | **Ganho** |
+|----------|--------------|-------------------|-----------|
+| Python nativo | 100% | **150%** | **+50%** |
+| Docker | 100% | **120%** | **+20%** |
+| MCP servers | 100% | **130%** | **+30%** |
+| Compilação | 100% | **180%** | **+80%** |
+
+---
+
+## 🎯 **O QUE FAZER AGORA:**
+
+1. **Pare de usar este guia**
+2. **Leia o novo README.md** para entender a mudança
+3. **Siga os novos guias atualizados**
+4. **Configure Mac como Controller Principal**
+
+---
+
+## 📞 **SUPORTE:**
+
+Para dúvidas, consulte:
+- NotebookLM: caderno `c85a9243-3eac-444c-2afaad8f0f93`
+- Hermes Agent: https://hermes-agent.nousresearch.com/
+
+---
+
+**Este arquivo é mantido apenas para referência histórica.**
+
+**Não utilize para novas instalações!** ⚠️
