@@ -1,231 +1,124 @@
-# 🍎 Hermes Mac M1 Setup - Arquitetura 3.0
+# 🏗️ Hermes Multi-Machine — Arquitetura 3.0
 
-## 🎯 **O QUE É ESTE REPO**
-
-Guias completos para configurar o **Mac M1 como Controller Principal** do ecossistema Hermes Agent, baseados em consulta ao NotebookLM e melhores práticas.
+> **Última atualização:** 25 de Maio de 2026
+> **Status:** ✅ Infra SSH completa e testada
 
 ---
 
-## 🚨 **MUDANÇA ESTRATÉGICA IMPORTANTE!**
+## 📐 Arquitetura
 
-### **ANTES (Errado - Obsoleto):**
 ```
-WSL = Controller (roda gateway, Telegram)
-Mac = Worker Passivo (apenas executa tarefas)
+  TELEGRAM (App)
+      │
+      ▼
+┌─────────────────────────────────┐
+│   🍎 Mac M1 — CONTROLLER       │
+│   Gateway Telegram + WhatsApp   │
+│   Hermes v0.14.0                │
+│   Orquestra tarefas via SSH     │
+└──────┬──────────────┬───────────┘
+       │ SSH          │ SSH
+       ▼              ▼
+┌──────────────┐ ┌───────────────┐
+│ 🐧 WSL       │ │ 🪟 Windows    │
+│ Worker Linux │ │ Worker Win    │
+│ Hermes v0.14 │ │ OpenSSH Srv   │
+│ IP: via Win  │ │ IP: 192.168.  │
+│              │ │      0.12     │
+└──────────────┘ └───────────────┘
 ```
 
-### **DEPOIS (Correto - Atual):**
-```
-Mac M1 = Controller Principal (centraliza TUDO)
-WSL = Worker Linux (tarefas Linux específicas)
-Windows = Worker Windows (tarefas Windows específicas)
-```
-
-**Por que?** Mac M1 é **150% mais rápido** em Python nativo e **180% mais rápido** em compilação que WSL x86_64!
+**Princípio:** Um único gateway (Mac), workers acessíveis via SSH.
+Sem bot-bot communication. Sem gateway duplicado.
 
 ---
 
-## 📊 **PERFORMANCE ARM vs x86:**
+## ✅ Status Atual
 
-| Operação | x86_64 (WSL) | ARM64 (M1 nativo) | **Ganho** |
-|----------|--------------|-------------------|-----------|
-| Python nativo | 100% | **150%** | **+50%** |
-| Docker | 100% | **120%** | **+20%** |
-| MCP servers | 100% | **130%** | **+30%** |
-| Compilação | 100% | **180%** | **+80%** |
+### Mac M1 (Controller)
+- ✅ Hermes v0.14.0
+- ✅ SSH key gerada (ed25519)
+- ✅ SSH para WSL testado e funcionando
+- ✅ Telegram bot configurado
+- ✅ Gateway rodando
 
-**Conclusão:** Mac M1 é **MAIS RÁPIDO** e mais estável para rodar 24/7!
+### WSL (Worker Linux)
+- ✅ Hermes v0.14.0 instalado (este é o bot "her" no Telegram)
+- ✅ SSH server rodando (porta 22)
+- ✅ SSH key do Mac autorizada
+- ✅ Port Proxy Windows (0.0.0.0:22 → 172.22.140.182:22)
+- ✅ Firewall Windows regra SSH ativa
+- ✅ Gateway ATIVO (aguardando definição se desativa)
+- ❌ Docker NÃO instalado (opcional)
 
----
-
-## 📚 **GUIAS DISPONÍVEIS:**
-
-### **🚀 COMECE AQUI:**
-1. **[RESUMO_EXECUTIVO_ARQUITETURA.md](RESUMO_EXECUTIVO_ARQUITETURA.md)**
-   - Visão geral da mudança estratégica
-   - O que muda na prática
-   - Próximos passos
-   - Tempo estimado: 1-2 horas
-
-### **🍎 PARA O MAC (Controller Principal):**
-2. **[MAC_M1_CONTROLLER_INSTRUCOES.md](MAC_M1_CONTROLLER_INSTRUCOES.md)**
-   - 15 passos detalhados
-   - Configurar provider (Z.AI ou Nous Portal)
-   - Ativar gateway e Telegram
-   - Configurar Launch Agents (24/7)
-   - Instalar Docker Desktop (ARM)
-   - Configurar NotebookLM e Google Workspace
-   - Tempo estimado: 30-45 min
-
-### **🐧 PARA O WSL (Worker Linux):**
-3. **[WSL_WORKER_INSTRUCOES.md](WSL_WORKER_INSTRUCOES.md)**
-   - 15 passos detalhados
-   - Parar e desativar gateway
-   - Configurar SSH server
-   - Criar worker script
-   - Configurar systemd service
-   - Tempo estimado: 15-20 min
-
-### **🔄 MIGRAÇÃO COMPLETA:**
-4. **[GUIA_MIGRACAO_ARQUITETURA.md](GUIA_MIGRACAO_ARQUITETURA.md)**
-   - Plano completo em 5 fases
-   - Riscos e mitigações
-   - Checklist detalhado
-   - Tempo total: 1-2 horas
+### Windows (Worker)
+- ✅ IP Wi-Fi: 192.168.0.12
+- ❌ OpenSSH Server precisa habilitar
+- ❌ Docker NÃO instalado
 
 ---
 
-## ⚠️ **ARQUIVOS OBSOLETOS:**
+## 🔗 Como Acessar Workers do Mac
 
-- ❌ `MAC_M1_MINIMAL_SETUP.md` - Obsoleto (arquitetura antiga)
-- ❌ `mac-m1-minimal-setup.sh` - Obsoleto (arquitetura antiga)
-- ❌ `hermes-mac-daemon.sh` - Ainda útil mas precisa de adaptação
-- ❌ `hermes-remote-control.sh` - Ainda útil mas precisa de adaptação
-
----
-
-## 🎯 **COMO USAR ESTE REPO:**
-
-### **Opção 1: Clonar e Ler**
+### WSL (via Windows port proxy)
 ```bash
-git clone https://github.com/Lucasdoreac/hermes-mac-m1-setup.git
-cd hermes-mac-m1-setup
-
-# Comece lendo o resumo executivo
-cat RESUMO_EXECUTIVO_ARQUITETURA.md
+ssh lucas@192.168.0.12 "comando"
 ```
+O Windows redireciona porta 22 → WSL 172.22.140.182:22
 
-### **Opção 2: Baixar Guia Específico**
+### Windows (quando OpenSSH habilitado)
 ```bash
-# Baixar apenas o guia do Mac
-curl -O https://raw.githubusercontent.com/Lucasdoreac/hermes-mac-m1-setup/main/MAC_M1_CONTROLLER_INSTRUCOES.md
-
-# Baixar apenas o guia do WSL
-curl -O https://raw.githubusercontent.com/Lucasdoreac/hermes-mac-m1-setup/main/WSL_WORKER_INSTRUCOES.md
-```
-
-### **Opção 3: Ler Direto no GitHub**
-1. Acesse: https://github.com/Lucasdoreac/hermes-mac-m1-setup
-2. Clique no arquivo `.md` que deseja ler
-3. Siga as instruções
-
----
-
-## 🏗️ **ARQUITETURA FINAL:**
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│              Mac M1 (CONTROLLER PRINCIPAL)                  │
-│              ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━               │
-│  ✅ Telegram Gateway (centralizado)                         │
-│  ✅ WhatsApp Gateway (centralizado)                        │
-│  ✅ Google Workspace (integrado)                            │
-│  ✅ NotebookLM (sincronizado)                               │
-│  ✅ Orchestrator distribuído                                │
-│  ✅ Docker Desktop (ARM nativo - 120% performance)          │
-│  ✅ Hermes Agent (150% Python nativo)                       │
-│  ✅ Launch Agents (24/7 auto-start)                         │
-│  ✅ MCP Servers (5x)                                        │
-│  ✅ Nous Portal (300+ modelos)                              │
-└────────┬──────────────┬────────────────┬────────────────────┘
-         │              │                │
-    ┌────▼────┐   ┌───▼─────────┐   ┌───▼────────┐
-    │  WSL    │   │  Windows    │   │  Docker    │
-    │ Worker  │   │  Worker     │   │  Containers│
-    │ Linux   │   │  Gateway    │   │  ARM64     │
-    │         │   │             │   │            │
-    │  ❌ GW  │   │  ❌ GW      │   │  Jobs      │
-    │  ❌ TG  │   │  ❌ TG      │   │  Pesados   │
-    └─────────┘   └─────────────┘   └────────────┘
+ssh Lucas@192.168.0.12 "powershell comando"
 ```
 
 ---
 
-## 📋 **CHECKLIST RÁPIDO:**
+## 📁 Arquivos deste Repo
 
-### **Mac (Controller):**
-- [ ] Provider configurado (Z.AI ou Nous Portal)
-- [ ] Gateway ativado no config.yaml
-- [ ] Telegram configurado
-- [ ] Gateway rodando
-- [ ] Launch Agent configurado
-- [ ] Docker Desktop instalado
-- [ ] NotebookLM configurado (nlm)
-- [ ] Google Workspace configurado (gws)
-- [ ] MCP servers ativos (5x)
-
-### **WSL (Worker):**
-- [ ] Gateway parado
-- [ ] Gateway desativado no config.yaml
-- [ ] Telegram desativado no config.yaml
-- [ ] SSH server configurado
-- [ ] Worker script criado
-- [ ] Systemd service configurado
+| Arquivo | Descrição |
+|---------|-----------|
+| `README.md` | Este arquivo — visão geral |
+| `INFRA_SETUP_COMPLETO.md` | Guia completo de configuração SSH |
+| `ARCHIVE/` | Guias antigos da versão 2.0 |
 
 ---
 
-## 🚨 **NÃO LIMPAR "BLOAT" DO MAC!**
+## 📋 Checklist
 
-Baseado no NotebookLM, **MANTER**:
-- ✅ HuggingFace Cache (1.4GB) - Modelos ML
-- ✅ UV Cache (1.3GB) - Python packages
-- ✅ Hermes Agent (1.1GB) - Essencial
-- ✅ npm (706MB) - Development tools
-- ✅ Chrome - Navegador principal
-- ✅ Stremio - App de streaming
+### Mac (Controller)
+- [x] Hermes instalado
+- [x] Telegram bot configurado
+- [x] Gateway rodando
+- [x] SSH keys configuradas
+- [x] Conexão WSL testada
 
-**Pode limpar apenas:**
-- Downloads antigos (+30 dias)
-- Caches do Chrome
-- Photo Booth (2018-2019)
+### WSL (Worker)
+- [x] Hermes instalado
+- [x] SSH server rodando
+- [x] SSH key do Mac autorizada
+- [x] Port proxy configurado
+- [x] Firewall regra SSH
+- [ ] Gateway desativado (decidir)
+- [ ] Docker (opcional)
 
----
-
-## 📞 **SUPORTE:**
-
-Se encontrar problemas:
-1. Consultar os guias completos (cada um tem seção de troubleshooting)
-2. Consultar NotebookLM (caderno `c85a9243-3eac-444c-2afaad8f0f93`)
-3. Abrir issue neste repo
+### Windows (Worker)
+- [ ] OpenSSH Server habilitado
+- [ ] Docker (opcional)
 
 ---
 
-## 📚 **REFERÊNCIAS:**
+## ⚠️ Notas Importantes
 
-- **Hermes Agent:** https://hermes-agent.nousresearch.com/
-- **Nous Portal:** https://portal.nousresearch.com
-- **NotebookLM MCP:** https://github.com/NousResearch/notebooklm-mcp-cli
-- **Docker Desktop:** https://www.docker.com/products/docker-desktop/
-
----
-
-## 🎯 **PRÓXIMO PASSO:**
-
-**Comece lendo:** [RESUMO_EXECUTIVO_ARQUITETURA.md](RESUMO_EXECUTIVO_ARQUITETURA.md)
-
-**Depois siga:** [MAC_M1_CONTROLLER_INSTRUCOES.md](MAC_M1_CONTROLLER_INSTRUCOES.md)
+- **NÃO limpar "bloat" do Mac** — HuggingFace, UV cache, npm são necessários
+- **Docker é opcional** — só necessário para sandboxing de comandos arriscados
+- **O WSL TEM Hermes instalado** — é o bot "her" no Telegram
+- **Rede WSL = modo NAT** — acesso via port proxy do Windows
 
 ---
 
-**Última atualização:** 24 de Maio de 2026  
-**Versão:** 3.0.0 (Arquitetura Atualizada)  
-**Status:** ✅ Pronto para Implementação
+## 📚 Referências
 
----
+- Hermes Agent: https://hermes-agent.nousresearch.com/
+- NotebookLM caderno: `c85a9243-3eac-444c-2afaad8f0f93`
 
-## 💡 **DICA FINAL:**
-
-**Faça a migração em etapas:**
-1. Configure Mac completamente
-2. Teste Mac funcionando sozinho
-3. Só então configure WSL como worker
-4. Teste comunicação Mac → WSL
-5. Valide tudo funcionando
-
-**Não tente mudar tudo de uma vez!** 🎯
-
----
-
-**Licença:** MIT  
-**Autor:** Lucasdoreac  
-**Contribuições:** Welcome!
+**Licença:** MIT | **Autor:** Lucasdoreac
